@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="./eel.js"></script>
+    <script type="text/javascript" src="./script.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>RAKTOKOROBI INVENTORY SOFTWARE</title>
+    <script>
+        window.onload = async function() {
+            // Simple password check on page load
+            var password = prompt("Password:");
+            // Replace "mypassword" with your actual password
+            var validate_resp = await eel.validate_password(password)();
+        };
+    </script>
+</head>
+<body>
+    <!-- <h1>Hello from Eel!</h1>
+    <button onclick="return sayHello();">
+        Click me
+    </button>
+    <div id="response">
+        response div
+    </div> -->
+
+    <div class="modal-overlay" id="modalOverlay">
+        <!-- Modal Content -->
+        <div class="modal">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <h2>REQUISITION SLIP</h2><br>
+            <div style="display: flex; flex-direction: row; justify-content: space-around; align-items: center;">
+                <div class="button-clear" onclick="return printRequisition();">
+                    PRINT REQUISITION SLIP
+                </div>
+            </div>
+            <div id="reqlist" style="display: flex; flex-direction: column; width: 100%; margin: 5px; padding: 15px; overflow-y: auto; overflow-x: auto; font-weight: bold; text-align: center;"></div>
+            <!-- <input id="billsummary_startbno" type="text" class="text-input" placeholder="Starting Bill Number">
+            <input id="billsummary_endbno" type="text" class="text-input" placeholder="Ending Bill Number"> -->
+            <!-- <div class="modal-buttons">
+                <button id="okBtn" class="button-clear" onclick="return genSummary_bno(document.getElementById('billsummary_startbno').value, document.getElementById('billsummary_endbno').value);">Generate Summary</button>
+                <button id="cancelBtn" class="button-clear">Cancel</button>
+            </div> -->
+        </div>
+    </div>
+    <script>
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('closeBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        closeBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+        });
+    </script>
+
+    <div class="modal-overlay1" id="modalOverlay1">
+        <!-- Modal Content -->
+        <div class="modal1">
+            <span class="close-btn1" id="closeBtn1">&times;</span>
+            <h2>New Item</h2>
+            <form id="newitemform">
+                <input id="newitemname_input" type="text"  class="text-input" placeholder="Item Name..." required>
+                <input id="newitemunit_input" type="text"  class="text-input" placeholder="Item Unit..." required>
+                <input id="newitemminqty_input" type="number"  class="text-input" placeholder="Minimum Quantity..." required>
+                <div class="modal-buttons1">
+                    <button id="NEWITEMADDBTN" class="button-clear" onclick="return addNewItem();">ADD NEW ITEM</button>
+                    <button id="cancelBtn1" class="button-clear">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const modalOverlay1 = document.getElementById('modalOverlay1');
+        const closeBtn1 = document.getElementById('closeBtn1');
+        const cancelBtn1 = document.getElementById('cancelBtn1');
+
+        closeBtn1.addEventListener('click', () => {
+            modalOverlay1.style.display = 'none';
+        });
+
+        cancelBtn1.addEventListener('click', () => {
+            modalOverlay1.style.display = 'none';
+        });
+    </script>
+
+
+    <div class="menu-bar">
+        <div class="dropdown">
+            <button class="dropbtn" onclick="return generateRequisition();">REQUISITION LIST
+            </button>
+            <div class="dropdown-content" id="opengenbillbtns">
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="dropbtn" onclick="return newItemShowModal();">NEW ITEM
+            </button>
+            <div class="dropdown-content" id="opengenbillbtns">
+            </div>
+        </div>
+        <!-- <div class="dropdown">
+            <button class="dropbtn" onclick="return generateRequisition();">SHOW INVENTORY
+            </button>
+            <div class="dropdown-content" id="opengenbillbtns">
+            </div>
+        </div> -->
+        
+    </div>
+
+    <div class="billBoxMainParent">
+        
+        <div id="billingdets_ParentCont" class="billingDetsParent">
+            <div id="itemMenu" class="itemMenu">
+                <div style="margin-top: 2px; margin-bottom: 2px;">
+                    <!-- <label for="room_nums_input">KOT Number/s:</label> -->
+                    <input type="text" id="itemsearch_input" class="text-input-search" placeholder="Search Items...">
+                </div>
+                <div id="itemslist_filtered" class="select_items_list">
+                    <!-- <div class="menulist-itemclass">
+                        1. Luchi Chholar Dal/Alu Chachhari
+                    </div> -->
+                </div>
+            </div>
+            
+            <div id="billSummaryParentCont" class="billSummaryParentCont">
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <h3>SELECTED ITEMS</h3>
+                </div>
+                <div style="display: flex; flex-direction: row; justify-content: space-around;">
+                    <!-- <div style="display: flex; width: 5%; font-size: large; font-weight: bold; justify-content: center; align-items: center;">ITEM NO</div>
+                    <div style="display: flex; width: 45%; font-size: large; font-weight: bold; justify-content: center; align-items: center;">ITEM NAME</div>
+                    <div style="display: flex; width: 12.5%; font-size: large; font-weight: bold; justify-content: center; align-items: center;">QTY</div> -->
+                    <!-- <div style="display: flex; width: 10%; font-size: large; font-weight: bold; justify-content: center; align-items: center;">Qty.</div> -->
+                    <!-- <div style="display: flex; width: 15%; font-size: large; font-weight: bold; justify-content: center; align-items: center;">Amt</div> -->
+                </div>
+                <div id="billsummaryparentact" class="billsummary_actualparent">
+                    <!-- <div class="billeditem_cont">
+                        <div class="slno_billsummary_class">
+                            12
+                        </div>
+                        <div class="itemname_billsummary_class">
+                            Paratha with Alu Dum
+                        </div>
+                        <div class="qty_billsummary_class">
+                            <input type="text" id="qty_bill_input" class="text-input-qty_billsummary" value="00">
+                        </div>
+                       <div class="delitem_billsummary_class">
+                            X
+                        </div>
+                    </div> -->
+                </div>
+                <div style="display: flex; flex-direction: row; justify-content: space-around; align-items: center;">
+                    <div class="button-123" onclick="return addCurrentToInventory();">
+                        STORE IN
+                    </div>
+                    <div class="button-123" onclick="return removeCurrentFromInventory();">
+                        STORE OUT
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="date_input" class="text-input"></div>
+    </div>
+    
+
+</body>
+</html>
